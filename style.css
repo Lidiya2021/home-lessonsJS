@@ -1,18 +1,30 @@
 /*обнуление стилей*/
-*{
+
+* {
     padding: 0;
     margin: 0;
-   
 }
 
-/*.container{
+.navigation {
     width: 100%;
-}*/
-.navigation{
     height: 45px;
     background-color: rgb(219, 217, 217);
-    align-self:baseline;
+    align-self: baseline;
 }
+
+main,
+.backet {
+    width: 1600px;
+    margin: 0 auto;
+}
+
+h2 {
+    color: blue;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
 .button1 {
     background-color: white;
     border: none;
@@ -22,7 +34,8 @@
     border-radius: 50%;
     margin: 10px;
 }
-.finde{
+
+.finde {
     border: none;
     color: white;
     margin: 10px;
@@ -31,14 +44,17 @@
     font-size: 20px;
     width: 700px;
 }
-.backet{
+
+.backet {
     height: 50px;
-    outline: 2px solid #000; 
+    outline: 2px solid #000;
 }
-a{
+
+a {
     text-decoration: none;
 }
-.cart-button{
+
+.cart-button {
     background-color: white;
     border-radius: 25px;
     padding: 5px 25px;
@@ -46,28 +62,43 @@ a{
     margin-left: 90%;
     font-size: 20px;
 }
-.goods-list{
+
+.cart-button:hover,
+.button3:hover {
+    background-color: #9c9cdb;
+    transform: translateY(2px);
+}
+
+.cart-button:active,
+.button3:active {
+    background-color: rgb(214, 192, 206);
+    outline: none;
+    box-shadow: 15 0 15 0 10px rgb(14, 17, 19)
+}
+
+.goods-list {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    
 }
-.goods-item{
-display: block;
-text-decoration: none;
-padding: 30px;
-outline: 2px solid #000;
-margin: 30px;
 
+.goods-item {
+    display: block;
+    text-decoration: none;
+    padding: 30px;
+    outline: 2px solid #000;
+    margin: 30px;
 }
-h3, p{
+
+h3,
+p {
     text-align: center;
     padding: 10px;
     font-size: 30px;
     color: black;
 }
 
-.button3{
+.button3 {
     background-color: white;
     border-radius: 25px;
     padding: 5px 25px;
