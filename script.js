@@ -66,7 +66,7 @@ class GoodsList {
             h2Count.classList.add('.count');
             h2Count.innerHTML = `ИТОГО, общая стоимость товаров составляет: ${this.getCount()} рублей `;
 
-            document.body.appendChild(h2Count);
+            document.getElementById("main").append(h2Count);
         }
         //метод для перебора массива товаров 
     render() {
@@ -88,3 +88,22 @@ class GoodsList {
 const list = new GoodsList();
 list.fetchGoods();
 list.render();
+
+//2-2
+//раскрываем корзину товаров при нажатии на кнопку
+document.getElementById('click-to-hide').addEventListener("click", hiddenCloseclick);
+
+function hiddenCloseclick() {
+    let x = document.getElementById('hidden-element');
+    if (x.style.display == "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none"
+    }
+    let y = document.getElementById('main');
+    if (y.style.display == "block") {
+        y.style.display = "none";
+    } else {
+        y.style.display = "block"
+    }
+};
