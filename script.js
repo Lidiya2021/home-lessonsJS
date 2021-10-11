@@ -1,109 +1,130 @@
-//lessons-1
+function makeGETRequest(url, callback) {
+    var xhr;
+    
+    if (window.XMLHttpRequest) {
+      xhr = new XMLHttpRequest();
+      } else if (window.ActiveXObject) { 
+        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+    
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          callback(xhr.responseText);
+        }
+      }
+    
+      xhr.open('GET', url, true);
+      xhr.send();
+  }
+    
+  const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
 
-/*   const goods = [
-   { img: 'img//product1.png', title: 'Shirt', price: 150 },
-   { img: 'img//product2.png', title: 'Socks', price: 50},
-   { img: 'img//product3.png', title: 'Jacket', price: 350},
-   { img: 'img//product4.png', title: 'Shoes', price: 250},
-   { img: 'img//product5.png', title: 'Jacket', price: 350},
-   { img: 'img//product6.png', title: 'Shoes', price: 250},
- ];
-
- const renderGoodsItem = (img, title, price) => {
- return `
-   <div class="goods-item">
-     <img src="${img}" alt="карточка товара">
-     <h3>${title}</h3>
-     <p>${price}</p>
-     <button class="button3">Добавить</button>
-   </div>
- `;
- };
-
- const renderGoodsList = (list) => {
-   let goodsList = list.map(item => renderGoodsItem(item.img, item.title, item.price));
-   document.querySelector('.goods-list').innerHTML = goodsList.join('');
- }
- 
- onload = renderGoodsList;*/
-
-//lessons2-1  
-
-//Создали класс для карточки товара
 class GoodsItem {
-    constructor(title, price) {
-            this.title = title;
+    constructor(product_name, price) {
+            this.product_name = product_name;
             this.price = price;
         }
-        //этим метоlдом вернули НТМL разметку
+        
     render() {
         return `
     <div class="goods-item">
-      <h3>${this.title}</h3>
+      <h3>${this.product_name}</h3>
       <p>${this.price}</p>
       <button class="button3">Добавить в корзину<button>
-    </div>
-  `;
+    </div>`;
     }
-}
-//создали класс для списка товаров
+};
+
 class GoodsList {
     constructor() {
-            this.goods = []; //список товаров
+            this.goods = []; 
         }
-        //метод, который обращался бы к серверу и получал данные
-    fetchGoods() {
-            this.goods = [
-                { title: 'Shirt', price: 150 },
-                { title: 'Socks', price: 50 },
-                { title: 'Jacket', price: 350 },
-                { title: 'Shoes', price: 250 },
-            ];
-        }
-        //создаем новый элемент
-    createCount() {
-            const h2Count = document.createElement('h2');
-            h2Count.classList.add('.count');
-            h2Count.innerHTML = `ИТОГО, общая стоимость товаров составляет: ${this.getCount()} рублей `;
-
-            document.getElementById("main").append(h2Count);
-        }
-        //метод для перебора массива товаров 
+        
+        fetchGoods(cb) {
+            makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
+            this.goods = JSON.parse(goods);
+            cb();
+            })
+        };
+                
     render() {
             let listHtml = '';
             this.goods.forEach(good => {
-                const goodItem = new GoodsItem(good.title, good.price);
+                const goodItem = new GoodsItem(good.product_name, good.price);
                 listHtml += goodItem.render();
             });
             document.querySelector('.goods-list').innerHTML = listHtml;
-
-            this.createCount();
         }
-        //Определение суммы товаров
-    getCount() {
-        return this.goods.reduce((prev, { price }, array) => prev + price, 0);
-    }
 }
 
 const list = new GoodsList();
-list.fetchGoods();
-list.render();
+list.fetchGoods(() => {
+    list.render();
+  });
 
-//2-2
-//раскрываем корзину товаров при нажатии на кнопку
-document.getElementById('click-to-hide').addEventListener("click", hiddenCloseclick);
-
-function hiddenCloseclick() {
-    let x = document.getElementById('hidden-element');
-    if (x.style.display == "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none"
+class Basket {
+    constructor() {
+        this.element = document.createElement('button');
+        this.element.className = '.basket-card';
+        this.element.append('Корзина');
     }
-    let y = document.getElementById('main');
-    if (y.style.display == "block") {
-        y.style.display = "none";
-    } else {
-        y.style.display = "block"
+    setClickHandler(clickHandler) {
+        this.element.onclick = clickHandler;
     }
-};
+    render() {
+        document.querySelector('header').append(this.element);
+    }
+  };
+  
+  class BasketCard {
+    basketGoods = [];
+    constructor() {
+        this.setVision.bind(this);
+        this.render.bind(this);
+    }
+    fetchBasketGoods() {
+        returngetBasketGoods().then((basketGoods) => {
+            this.basketGoods = this.basketGoods.concatants;
+        })
+    }
+    setVision(vision) {
+        document.querySelector('basket-card').style.display = vision ? 'block' : 'none';
+    }
+    element = `
+    <div class = "basket-card">
+        <div class = 'basket-card__header'>
+            <button class = 'close-basket-card'> Закрыть 
+            </button> 
+        </div>
+        <div class = 'basket-card__body'>
+        </div>
+    </div>
+    `;
+    render() {
+        document.querySelector("body").insertAdjacentHTML("beforeend", this.element);
+        document.querySelector('.close-basket-card').onclick = this.setVision.bind(this, false)
+        document.querySelector('.basket-card__body').innerHTML = this.basketGoods.map(({ product_name, price }) => {
+            const _basketItem = new BasketItem(product_name, price);
+            return _basketItem.render();
+        }).join('')
+    }
+  };
+  
+  class BasketItem {
+    constructor(title, price) {
+        this.title = title;
+        this.price = price;
+    }
+    render() {
+        return `
+            <div class='basket-item'>
+                <div>
+                    <h3>${this.title}</h3>
+                    <p>${this.price}</p>
+                </div>
+                <div>
+                <button>удалить</button>
+            </div>
+        `;
+    }
+  };
