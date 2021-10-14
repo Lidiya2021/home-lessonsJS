@@ -1,4 +1,4 @@
-function makeGETRequest(url, callback) {
+/*function makeGETRequest(url, callback) {
     var xhr;
     
     if (window.XMLHttpRequest) {
@@ -15,16 +15,27 @@ function makeGETRequest(url, callback) {
     
       xhr.open('GET', url, true);
       xhr.send();
-  }
-    
-  const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+  }*/
+
+const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
+
+// Функция запроса / ответа на промисах
+function makeGETRequest(url, callback) {
+    return new Promise((resolve, reject) => {
+        let xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject;
+        xhr.open("GET", url, true);
+        xhr.onload = () => resolve(callback(xhr.responseText));
+        xhr.onerror = () => reject(xhr.statusText);
+        xhr.send();
+    });
+}
 
 class GoodsItem {
     constructor(product_name, price) {
-            this.product_name = product_name;
-            this.price = price;
-        }
-        
+        this.product_name = product_name;
+        this.price = price;
+    }
+
     render() {
         return `
     <div class="goods-item">
@@ -37,30 +48,43 @@ class GoodsItem {
 
 class GoodsList {
     constructor() {
-            this.goods = []; 
-        }
-        
-        fetchGoods(cb) {
-            makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
+        this.goods = [];
+        this.filteredGoods = [];
+    }
+
+    fetchGoods(cb) {
+        makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
             this.goods = JSON.parse(goods);
+            this.filteredGoods = JSON.parse(goods);
             cb();
-            })
-        };
-                
+        })
+    };
+
     render() {
-            let listHtml = '';
-            this.goods.forEach(good => {
-                const goodItem = new GoodsItem(good.product_name, good.price);
-                listHtml += goodItem.render();
-            });
-            document.querySelector('.goods-list').innerHTML = listHtml;
-        }
+        let listHtml = '';
+        this.filteredGoods.forEach(good => {
+            const goodItem = new GoodsItem(good.product_name, good.price);
+            listHtml += goodItem.render();
+        });
+        document.querySelector('.goods-list').innerHTML = listHtml;
+    }
+
+    filterGoods(value) {
+        const regexp = new RegExp(value, 'i');
+        this.filteredGoods = this.goods.filter(goods => regexp.test(goods.product_name));
+        this.render();
+    }
+
+    /*searchButton.addEventListener('click', (e) => {
+        const value = searchInput.value;
+        list.filterGoods(value);
+    });*/
 }
 
 const list = new GoodsList();
 list.fetchGoods(() => {
     list.render();
-  });
+});
 
 class Basket {
     constructor() {
@@ -74,9 +98,9 @@ class Basket {
     render() {
         document.querySelector('header').append(this.element);
     }
-  };
-  
-  class BasketCard {
+};
+
+class BasketCard {
     basketGoods = [];
     constructor() {
         this.setVision.bind(this);
@@ -108,9 +132,9 @@ class Basket {
             return _basketItem.render();
         }).join('')
     }
-  };
-  
-  class BasketItem {
+};
+
+class BasketItem {
     constructor(title, price) {
         this.title = title;
         this.price = price;
@@ -127,4 +151,4 @@ class Basket {
             </div>
         `;
     }
-  };
+};
