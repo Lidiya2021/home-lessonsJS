@@ -12,8 +12,13 @@
     align-self: baseline;
 }
 
-main,
-.backet {
+.goods-search,
+.search-button,
+.cart-button {
+    font-size: 25px;
+}
+
+main {
     width: 1600px;
     margin: 0 auto;
 }
@@ -46,21 +51,9 @@ h2 {
 }
 
 .backet {
-    height: 50px;
-}
-
-a {
-    text-decoration: none;
-}
-
-.cart-button {
-    background-color: white;
-    border-radius: 25px;
-    padding: 5px 25px;
-    margin-top: 5px;
-    margin-left: 90%;
-    font-size: 20px;
-    outline: none;
+    float: right;
+    margin-top: 20px;
+    margin-right: 20px;
 }
 
 .cart-button:hover,
@@ -74,31 +67,6 @@ a {
     background-color: rgb(214, 192, 206);
     outline: none;
     box-shadow: 15 0 15 0 10px rgb(14, 17, 19)
-}
-
-
-/*корзина с товаром*/
-
-.shopping-cart {
-    width: 540px;
-    border-collapse: collapse;
-    height: auto;
-    margin: auto;
-    table-layout: fixed;
-    display: none;
-}
-
-.shopping-cart,
-.shopping-cart th,
-.shopping-cart tr {
-    border: 1px solid #595959;
-}
-
-.shopping-cart th,
-.shopping-cart tr {
-    padding: 3px;
-    width: 50px;
-    height: 35px;
 }
 
 .goods-list {
