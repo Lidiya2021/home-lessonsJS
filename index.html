@@ -12,6 +12,33 @@
 </head>
 
 <body>
+    <p>Задание 1:Дан большой текст, в котором для оформления прямой речи используются одинарные кавычки. Придумать шаблон, который заменяет одинарные кавычки на двойные.
+    </p>
+    <pre class="task1"></pre>
+    <p>Задание 2:Улучшить шаблон так, чтобы в конструкциях типа aren't одинарная кавычка не заменялась на двойную</p>
+    <pre class="task2"></pre>
+    <script>
+        let str = `
+            One: 'Hi Mary.' Two: 'Oh, hi.'
+            One: 'How are you doing?'
+            Two: 'I'm doing alright. How about you?'
+            One: 'Not too bad. The weather is great isn't it?'
+            Two: 'Yes. It's absolutely beautiful today.'
+            One: 'I wish it was like this more frequently.'
+            Two: 'Me too.'
+        `;
+
+        let strTask1 = str.replace(/\'/g, "\""); //строка с заданием 1
+        console.log(strTask1);
+        let strTask2 = str.replace(/\B\'/g, "\""); //строка с заданием 2
+        console.log(strTask2);
+        document.querySelector(".task1").innerHTML = strTask1;
+        document.querySelector(".task2").innerHTML = strTask2;
+    </script>
+</body>
+<!--
+
+<body>
     <header>
         <div class="navigation">
             <button class="button1"></button>
@@ -38,5 +65,6 @@
     </main>
     <script src="script.js"></script>
 </body>
+-->
 
 </html>
