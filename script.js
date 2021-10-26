@@ -1,154 +1,207 @@
-/*function makeGETRequest(url, callback) {
-    var xhr;
-    
-    if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest();
-      } else if (window.ActiveXObject) { 
-        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+/*const GOODS =  [
+    { title: 'Shirt', price: 150 },
+    { title: 'Socks', price: 50 },
+    { title: 'Jacket', price: 350 },
+    { title: 'Shoes', price: 250 },
+]*/
+
+/*const CORE_API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';*/
+/*const GET_GOODS_URL = "/catalogData.json";
+const GET_BASKET_GOODS_URL = "/getBasket.json ";*/
+
+const GET_GOODS_URL = "http://localhost:8000/goods.json";
+const ADD_GOOD_URL = "http://localhost:8000/api";
+const GET_BASKET_GOODS_URL = "http://localhost:8000/basket-goods.json ";
+
+const transformGoods = function (goods) {
+    return goods.map((_good) => {
+      return {
+        id: _good.id_product,
+        title: _good.product_name,
+        price: _good.price
       }
-    
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
-          callback(xhr.responseText);
+    })
+  }
+
+/*const service = (method, postfix)=> (
+    new Promise((resolve) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open(method, `${CORE_API_URL}${postfix}`, true);
+        xhr.send();
+        xhr.onload = (event) => {
+        resolve(JSON.parse(event.target.response));
+        }
+    })
+);*/
+
+const service = (method, path, body) => (
+  new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, path, true);
+    if (body) {
+      xhr.setRequestHeader("Content-type", "application/json");
+    }
+    xhr.send(body);
+    xhr.onload = (event) => {
+      resolve(JSON.parse(event.target.response));
+    }
+  })
+);
+
+Vue.component('custom-button', {
+    data: function () {
+      return {
+        style: {
+          border: '2px solid black',
+          padding: '6px',
+          borderRadius: '5px',
+          cursor: 'pointer'
         }
       }
+    },
+    template: `
+      <button :style="style" @click="$emit('click')">
+        <slot></slot>
+      </button>
+    `
+  })
+
+Vue.component('basket-goods-item', {
+    props: ['item'],
+    data: function () {
+        return {
+          style: {
+            padding: '10px',
+            display: 'grid',
+            gridTemplateColumns: 'min-content 3fr 3fr 1fr'
+          }
+        }
+      },
+    template: `
+        <div class="basket-goods-item":style="style"> 
+            <div>{{ item.title }}</div>
+            <div></div>
+            <div>{{ item.price }}</div>
+            <custom-button>Удалить</custom-button>
+        </div>
+    `
+});
     
-      xhr.open('GET', url, true);
-      xhr.send();
-  }*/
+Vue.component('basket-card', {
+    props: ['textHeader'],
+    data: function () {
+        return {
+          styles: {
+            root: {
+              display: 'grid',
+              gridTemplateRows: 'min-content 1fr min-content'
+            },
+            header: {
+              padding: '20px',
+              background: 'grey',
+              display: 'grid',
+              gridTemplateColumns: ' 3fr  1fr ',
+              fontSize: '30px'
+            }
+          },
+          basketGoods: []
+        }
+      },
+    template: `
+        <div class="basket-card":style="styles.root">
+        <div :style="styles.header">
+           <slot name="header"></slot>
+        </div>
+        <div>
+           <slot></slot>
+        </div>
+        <div :style="styles.header">
+           <slot name="footer"></slot>
+        </div>>
+            <div></div>
+        </div>
+    `
+});
+  
 
-const API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
-
-// Функция запроса / ответа на промисах
-function makeGETRequest(url, callback) {
-    return new Promise((resolve, reject) => {
-        let xhr = window.XMLHttpRequest ? new window.XMLHttpRequest() : new window.ActiveXObject;
-        xhr.open("GET", url, true);
-        xhr.onload = () => resolve(callback(xhr.responseText));
-        xhr.onerror = () => reject(xhr.statusText);
-        xhr.send();
-    });
-}
-
-class GoodsItem {
-    constructor(product_name, price) {
-        this.product_name = product_name;
-        this.price = price;
-    }
-
-    render() {
-        return `
-    <div class="goods-item">
-      <h3>${this.product_name}</h3>
-      <p>${this.price}</p>
-      <button class="button3">Добавить в корзину<button>
-    </div>`;
-    }
-};
-
-class GoodsList {
-    constructor() {
-        this.goods = [];
-        this.filteredGoods = [];
-    }
-
-    fetchGoods(cb) {
-        makeGETRequest(`${API_URL}/catalogData.json`, (goods) => {
-            this.goods = JSON.parse(goods);
-            this.filteredGoods = JSON.parse(goods);
-            cb();
-        })
-    };
-
-    render() {
-        let listHtml = '';
-        this.filteredGoods.forEach(good => {
-            const goodItem = new GoodsItem(good.product_name, good.price);
-            listHtml += goodItem.render();
-        });
-        document.querySelector('.goods-list').innerHTML = listHtml;
-    }
-
-    filterGoods(value) {
-        const regexp = new RegExp(value, 'i');
-        this.filteredGoods = this.goods.filter(goods => regexp.test(goods.product_name));
-        this.render();
-    }
-
-    /*searchButton.addEventListener('click', (e) => {
-        const value = searchInput.value;
-        list.filterGoods(value);
-    });*/
-}
-
-const list = new GoodsList();
-list.fetchGoods(() => {
-    list.render();
+Vue.component('goods-item', {
+    props: ['item'],
+    template: `
+        <div class="goods-item">
+           <div>{{ item.title }}</div>
+           <div>
+              {{ item.price }}
+           </div>
+           <div>
+              <custom-button>добавить товар в корзину</custom-button>
+           </div>
+        </div>
+    `,
 });
 
-class Basket {
-    constructor() {
-        this.element = document.createElement('button');
-        this.element.className = '.basket-card';
-        this.element.append('Корзина');
-    }
-    setClickHandler(clickHandler) {
-        this.element.onclick = clickHandler;
-    }
-    render() {
-        document.querySelector('header').append(this.element);
-    }
-};
+/*const app  = new Vue({
+    el: '#app',
+    data: {
+        styles: {
+          border: "1px solid blue"
+        },
+        goods: GOODS,
+        filteredGoods: GOODS,
+        basketCardVision: false,
+        search: '' 
+    },*/
 
-class BasketCard {
-    basketGoods = [];
-    constructor() {
-        this.setVision.bind(this);
-        this.render.bind(this);
-    }
-    fetchBasketGoods() {
-        returngetBasketGoods().then((basketGoods) => {
-            this.basketGoods = this.basketGoods.concatants;
+    const app  = new Vue({
+      el: '#app',
+      data: {
+        styles: {
+          border: "1px solid blue"
+        },
+        goods: [],
+        filteredGoods: [],
+        basketGoods: [],
+        basketCardVision: false,
+        search: ''
+      },
+
+   /* mounted: function () {
+        service('GET', GET_GOODS_URL).then((goods) => {
+          const resultGoods = transformGoods(goods);
+          this.goods = resultGoods;
+          this.filteredGoods = resultGoods;
         })
-    }
-    setVision(vision) {
-        document.querySelector('basket-card').style.display = vision ? 'block' : 'none';
-    }
-    element = `
-    <div class = "basket-card">
-        <div class = 'basket-card__header'>
-            <button class = 'close-basket-card'> Закрыть 
-            </button> 
-        </div>
-        <div class = 'basket-card__body'>
-        </div>
-    </div>
-    `;
-    render() {
-        document.querySelector("body").insertAdjacentHTML("beforeend", this.element);
-        document.querySelector('.close-basket-card').onclick = this.setVision.bind(this, false)
-        document.querySelector('.basket-card__body').innerHTML = this.basketGoods.map(({ product_name, price }) => {
-            const _basketItem = new BasketItem(product_name, price);
-            return _basketItem.render();
-        }).join('')
-    }
-};
+      },*/
+      mounted: function () {
+        service('GET', GET_GOODS_URL).then((goods) => {
+          this.goods = goods;
+          this.filteredGoods = goods;
+        })
+        service('GET', GET_BASKET_GOODS_URL).then((basketGoods) => {
+          this.basketGoods = basketGoods;
+        })
+      },
 
-class BasketItem {
-    constructor(title, price) {
-        this.title = title;
-        this.price = price;
+        
+    methods: {
+        filterGoods: function (event) {
+            this.filteredGoods = this.goods.filter(({ title }) => {
+                return new RegExp(this.search, 'i').test(title);
+            })
+        },
+        openCard: function () {
+            this.basketCardVision = true;
+          },
+          closeCard: function () {
+            this.basketCardVision = false;
+          },
+          addGood: function ({ title, price, id }) {
+            service('PATCH', ADD_GOOD_URL, JSON.stringify({
+              id,
+              title,
+              price
+            })).then((_basketGoods) => {
+              this.basketGoods = _basketGoods;
+            })
+          }
     }
-    render() {
-        return `
-            <div class='basket-item'>
-                <div>
-                    <h3>${this.title}</h3>
-                    <p>${this.price}</p>
-                </div>
-                <div>
-                <button>удалить</button>
-            </div>
-        `;
-    }
-};
+});
