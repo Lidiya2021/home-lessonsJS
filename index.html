@@ -27,7 +27,7 @@
 
         <div class="header">
             <div>
-               Shop
+               Shop on server
             </div>
 
             <div class="right-container">
@@ -38,7 +38,8 @@
         </div>
     
         <div class="body">
-            <goods-item v-for="item in filteredGoods" :item="item"></goods-item>
+            <goods-item v-for="item in filteredGoods" :item="item"
+            @click="addGood" ></goods-item>
         </div>
     </div> 
 

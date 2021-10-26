@@ -1,13 +1,17 @@
-const GOODS =  [
+/*const GOODS =  [
     { title: 'Shirt', price: 150 },
     { title: 'Socks', price: 50 },
     { title: 'Jacket', price: 350 },
     { title: 'Shoes', price: 250 },
-]
+]*/
 
-const CORE_API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';
-const GET_GOODS_URL = "/catalogData.json";
-const GET_BASKET_GOODS_URL = "/getBasket.json ";
+/*const CORE_API_URL = 'https://raw.githubusercontent.com/GeekBrainsTutorial/online-store-api/master/responses';*/
+/*const GET_GOODS_URL = "/catalogData.json";
+const GET_BASKET_GOODS_URL = "/getBasket.json ";*/
+
+const GET_GOODS_URL = "http://localhost:8000/goods.json";
+const ADD_GOOD_URL = "http://localhost:8000/api";
+const GET_BASKET_GOODS_URL = "http://localhost:8000/basket-goods.json ";
 
 const transformGoods = function (goods) {
     return goods.map((_good) => {
@@ -19,7 +23,7 @@ const transformGoods = function (goods) {
     })
   }
 
-const service = (method, postfix) => (
+/*const service = (method, postfix)=> (
     new Promise((resolve) => {
         const xhr = new XMLHttpRequest();
         xhr.open(method, `${CORE_API_URL}${postfix}`, true);
@@ -28,6 +32,20 @@ const service = (method, postfix) => (
         resolve(JSON.parse(event.target.response));
         }
     })
+);*/
+
+const service = (method, path, body) => (
+  new Promise((resolve) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open(method, path, true);
+    if (body) {
+      xhr.setRequestHeader("Content-type", "application/json");
+    }
+    xhr.send(body);
+    xhr.onload = (event) => {
+      resolve(JSON.parse(event.target.response));
+    }
+  })
 );
 
 Vue.component('custom-button', {
@@ -121,7 +139,7 @@ Vue.component('goods-item', {
     `,
 });
 
-const app  = new Vue({
+/*const app  = new Vue({
     el: '#app',
     data: {
         styles: {
@@ -131,15 +149,38 @@ const app  = new Vue({
         filteredGoods: GOODS,
         basketCardVision: false,
         search: '' 
-    },
+    },*/
 
-    mounted: function () {
+    const app  = new Vue({
+      el: '#app',
+      data: {
+        styles: {
+          border: "1px solid blue"
+        },
+        goods: [],
+        filteredGoods: [],
+        basketGoods: [],
+        basketCardVision: false,
+        search: ''
+      },
+
+   /* mounted: function () {
         service('GET', GET_GOODS_URL).then((goods) => {
           const resultGoods = transformGoods(goods);
           this.goods = resultGoods;
           this.filteredGoods = resultGoods;
         })
+      },*/
+      mounted: function () {
+        service('GET', GET_GOODS_URL).then((goods) => {
+          this.goods = goods;
+          this.filteredGoods = goods;
+        })
+        service('GET', GET_BASKET_GOODS_URL).then((basketGoods) => {
+          this.basketGoods = basketGoods;
+        })
       },
+
         
     methods: {
         filterGoods: function (event) {
@@ -152,7 +193,15 @@ const app  = new Vue({
           },
           closeCard: function () {
             this.basketCardVision = false;
+          },
+          addGood: function ({ title, price, id }) {
+            service('PATCH', ADD_GOOD_URL, JSON.stringify({
+              id,
+              title,
+              price
+            })).then((_basketGoods) => {
+              this.basketGoods = _basketGoods;
+            })
           }
-
     }
 });
